@@ -1,0 +1,70 @@
+<div class="mx-auto max-w-7xl p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
+  <!-- Header -->
+  <header class="mb-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-800/60 backdrop-blur px-5 py-4 shadow-sm">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100">
+        Task Management Dashboard
+      </h1>
+      <div class="flex items-center gap-3">
+        <span class="text-sm md:text-base text-gray-700 dark:text-gray-300">
+          Logged in as: <span class="font-semibold">{{userName || 'Loading...'}}</span>
+        </span>
+        <button (click)="toggleDarkMode()" class="rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 px-3 py-2 text-sm font-medium text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-600 transition">
+          {{isDarkMode ? 'Light Mode' : 'Dark Mode'}}
+        </button>
+        <button (click)="loadTasks()" class="rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-2 text-sm font-medium transition">Refresh</button>
+        <button (click)="logout()" class="rounded-lg bg-rose-500 hover:bg-rose-600 text-white px-3 py-2 text-sm font-medium transition">Logout</button>
+      </div>
+    </div>
+  </header>
+  <!-- Create/Edit Form -->
+  <section class="mb-6" *ngIf="userRole !== 'viewer'">
+    <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <input formControlName="title" placeholder="Task title" class="p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+        <select formControlName="category" class="p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+          <option *ngFor="let cat of categories" [value]="cat">{{cat}}</option>
+        </select>
+      </div>
+      <textarea formControlName="description" placeholder="Description" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg mb-4 focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"></textarea>
+      <div class="flex items-center gap-4 mb-4">
+        <select formControlName="status" class="p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+          <option *ngFor="let stat of statuses" [value]="stat">{{stat}}</option>
+        </select>
+      </div>
+      <div class="flex gap-2">
+        <button type="submit" [disabled]="!taskForm.valid" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg shadow disabled:opacity-50 transition">{{ editingTask ? 'Update Task' : 'Create Task' }}</button>
+        <button type="button" (click)="resetForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg shadow transition">Cancel</button>
+      </div>
+    </form>
+  </section>
+  <!-- Chart Card -->
+  <section class="mb-6 bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow">
+    <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Task Completion Overview</h2>
+    <div class="relative h-64">
+      <canvas id="taskChart"></canvas>
+    </div>
+  </section>
+  <!-- Task Grid -->
+  <div cdkDropList [cdkDropListData]="tasks" (cdkDropListDropped)="drop($event)" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div *ngFor="let task of tasks" cdkDrag class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow hover:shadow-lg transition-shadow cursor-move {{getCardClass(task.status)}}">
+      <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-2">{{task.title}}</h3>
+      <p class="text-gray-600 dark:text-gray-300 mb-3">{{task.description}}</p>
+      <div class="flex justify-between items-center mb-3">
+        <span class="text-sm text-gray-500 dark:text-gray-400">Category: <span class="font-medium">{{task.category}}</span></span>
+        <span class="text-sm">Status: <span [class]="getStatusClass(task.status)">{{task.status}}</span></span>
+      </div>
+      <div class="flex items-center gap-2 mb-3" *ngIf="userRole !== 'viewer'">
+        <select [value]="task.status" (change)="updateStatus(task.id, $event)" class="p-2 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+          <option value="pending">Pending</option>
+          <option value="in-progress">In Progress</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+      <div class="flex gap-2" *ngIf="userRole !== 'viewer'">
+        <button (click)="editTask(task)" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded shadow">Edit</button>
+        <button (click)="deleteTask(task.id)" class="bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded shadow">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>

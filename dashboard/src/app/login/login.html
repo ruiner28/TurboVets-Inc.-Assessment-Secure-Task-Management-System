@@ -1,0 +1,14 @@
+<div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background-color: #f9fafb;">
+  <div style="width: 100%; max-width: 400px;">
+    <h2 style="text-align: center; font-size: 1.5rem; font-weight: bold; color: #111827;">Sign in to your account</h2>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" style="margin-top: 2rem;">
+      <div>
+        <input formControlName="email" type="email" required placeholder="Email" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.25rem;">
+      </div>
+      <div style="margin-top: 1rem;">
+        <input formControlName="password" type="password" required placeholder="Password" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.25rem;">
+      </div>
+      <button type="submit" [disabled]="!loginForm.valid" style="margin-top: 1rem; width: 100%; padding: 0.5rem; background-color: #3b82f6; color: white; border: none; border-radius: 0.25rem; cursor: pointer;">Sign in</button>
+    </form>
+  </div>
+</div>
